@@ -1,10 +1,12 @@
 const express = require('express')
-const cors=require('cors')
+const cors=require('cors');
+const { dbConnection } = require('../database/config');
 class Server{
     constructor(){
         this.app = express();
         this.port =process.env.PORT;
         this.usuarioPath='/api/usuario';
+        this.conectarBD()
         this.middleware();
 
         this.routes();
@@ -29,6 +31,9 @@ class Server{
             console.log(`Example app listening on port ${this.port}`)
           })
           
+    }
+    async conectarBD(){
+        await dbConnection()
     }
 }
 
