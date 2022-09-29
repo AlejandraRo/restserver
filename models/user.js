@@ -28,6 +28,11 @@ const usuarioSchema=Schema({
         default:false
     },
 })
+//sacar la contraseña
+usuarioSchema.methods.toJSON=function(){
+    const {contraseña,__v,...varUsuario}=this.toObject();
+    return varUsuario//almacena todos los datos menos la contraseña
+}
 
 
 module.exports=model('Usuario',usuarioSchema)

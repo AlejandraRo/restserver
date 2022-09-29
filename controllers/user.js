@@ -3,6 +3,8 @@
  const {request,response}=require('express')
  const Usuario=require('../models/user')
  const bcryptjs=require('bcryptjs')
+const { validate } = require('../models/user')
+const { validationResult } = require('express-validator')
 
  //enviando querys
  //localhost:8082/api/usuario?q=hola&nombre=mario&pkey=123
@@ -15,6 +17,10 @@ const userGet=(req, res) => {
     }
    
 const userPost=async(req, res) => {
+    const errors=validationResult(req)
+    if(!errors.isEmpty()){
+        return res.status(400).json(errors)
+    }
 
     //obteniendo información
     //const body=req.body;
@@ -22,6 +28,7 @@ const userPost=async(req, res) => {
     const {nombre,correo,contraseña,rol}=req.body
     //const usuario=new Usuario(body);
     const usuario=new Usuario({nombre,correo,contraseña,rol});
+    
 //verificar si el correo existe
     const correoExiste=await Usuario.findOne({correo})
     if(correoExiste){
