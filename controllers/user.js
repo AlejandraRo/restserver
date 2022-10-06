@@ -8,14 +8,39 @@ const { validationResult } = require('express-validator')
 
  //enviando querys
  //localhost:8082/api/usuario?q=hola&nombre=mario&pkey=123
-const userGet=(req, res) => {
-    const query=req.query
+const userGet=async(req, res) => {
+    
+    //si queremos con límite enviamos usuario?limite=2&rango=3
+    //const query=req.query
+    //destructuramos para recibir el límite
+    //{estado:true} para obtener solo los true
+    const {limite,rango}=req.query;
+    //para optimizar la respuesta del código se usa
+    const respuesta=await Promise.all([
+
+    Usuario.countDocuments({estado:true}),
+    Usuario.find({estado:true})
+                   .limit(Number(limite))
+                   .skip(Number(rango))    
+       
+    ]);
     res.json({
         msj:'Hello World!',
-        query});
-        
+        res
+        // usuarios,
+        // totalusu
+    // const usuarios=await Usuario.find({estado:true})
+    //                .limit(Number(limite))
+    //                .skip(Number(rango))
+    // const totalusu=await Usuario.countDocuments({estado:true})
+    // res.json({
+    //     msj:'Hello World!',
+    //     usuarios,
+    //     totalusu
+    // });       
     }
-   
+    )
+}
 const userPost=async(req, res) => {
     const errors=validationResult(req)
     if(!errors.isEmpty()){
@@ -71,6 +96,8 @@ const userPut=async(req, res) => {
         usuario});
     }
 const userDelete=(req, res) => {
+   // se usa para borrar, pero lo mejor es ocultarlos que eliminarlos de la base de datos
+   //const usuario=await Usuario.findByIdandDelete
     res.json({
         "msj":"Te hablo del delete"});
     }
