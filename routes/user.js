@@ -2,7 +2,7 @@
  const{Router}=require('express');
  const {check}=require("express-validator")
 const { userGet, userPut, userPost, userDelete } = require('../controllers/user');
-const { esRolValido } = require('../helpers/db-validators');
+const { esRolValido, correoExis, existeUsuId } = require('../helpers/db-validators');
 
 
  const router=Router();
@@ -10,7 +10,8 @@ const { esRolValido } = require('../helpers/db-validators');
 router.get('/', userGet
       );
 router.post('/',[
-      check('correo','correo no es válido').isEmail(),
+      //check('correo','correo no es válido').isEmail(),
+      check('correo').custom(correoExis),
       check('contraseña','el password debe contener mínimo 6 caractéres').isLength({min:6}),
       check('nombre','el nombre es obligatorio').not().isEmpty(),
       //lo comentamos porque gestionaremos con el modelo.
@@ -21,7 +22,13 @@ router.post('/',[
        userPost
       );
       //mandar parametro y editamos controller
-router.put('/:id', userPut 
+router.put('/:id',[
+      //verificar si el id es válido
+      //check('id','No es un id válido').isMongoId(),
+      check('id').custom(existeUsuId),
+      check('rol').custom(esRolValido),
+      check('correo').custom(correoExis)
+], userPut 
       );
 router.delete('/', userDelete
 );

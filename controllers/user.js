@@ -30,12 +30,12 @@ const userPost=async(req, res) => {
     const usuario=new Usuario({nombre,correo,contraseña,rol});
     
 //verificar si el correo existe
-    const correoExiste=await Usuario.findOne({correo})
-    if(correoExiste){
-        return res.status(400).json({
-            "msj":"Este email ya está registrado"
-        })
-    }
+    // const correoExiste=await Usuario.findOne({correo})
+    // if(correoExiste){
+    //     return res.status(400).json({
+    //         "msj":"Este email ya está registrado"
+    //     })
+    // }
     
 //encriptar la contraseña, el (es para configurar el nivel)
     const salt=bcryptjs.genSaltSync()
@@ -50,12 +50,25 @@ const userPost=async(req, res) => {
     })
      
     }
-const userPut=(req, res) => {
+const userPut=async(req, res) => {
+    const errors=validationResult(req)
+    if(!errors.isEmpty()){
+        return res.status(400).json(errors)
+    }
     //tomar un parametro de la dirección url
     const id=req.params
+    const {contraseña,google,correo,...resto}=req.body
+    //encriptar contraseña
+    if(contraseña)
+    {
+    const salt=bcryptjs.genSaltSync()
+    resto.contraseña=bcryptjs.hashSync(contraseña,salt)
+    }
+    const usuario=await Usuario.findOneAndUpdate(id,resto,{new:true})
     res.json({
         "msj":"Te hablo del put",
-        id});
+        id,
+        usuario});
     }
 const userDelete=(req, res) => {
     res.json({
